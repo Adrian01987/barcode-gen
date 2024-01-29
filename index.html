@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode PDF Generator</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.3/dist/JsBarcode.all.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Barcode PDF Generator</h1>
+
+        <div class="form-group">
+            <label for="pdfTitle">PDF Title (max 60 characters):</label>
+            <input type="text" id="pdfTitle" class="form-control pdf-title-input" maxlength="60" required>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 form-group">
+                <label for="columns">Columns (3-4):</label>
+                <input type="number" id="columns" class="form-control" min="3" max="4" required>
+            </div>
+            <div class="col-md-6 form-group">
+                <label for="rows">Rows (10-13):</label>
+                <input type="number" id="rows" class="form-control" min="10" max="13" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="barcodeData">Barcode Data (one per line, max 15 characters each):</label>
+            <textarea id="barcodeData" class="form-control" rows="10" required></textarea>
+        </div>
+
+        <button id="generatePdf" class="btn btn-primary">Generate PDF</button>
+    </div>
+    <script>window.jsPDF = window.jspdf.jsPDF;</script>
+    <script src="app.js"></script>
+    <script src="pdfGenerator.js"></script>
+
+</body>
+</html>
