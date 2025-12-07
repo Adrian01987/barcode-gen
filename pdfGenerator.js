@@ -38,15 +38,44 @@ function generatePdf(title, columns, rows, barcodeData) {
 
   barcodeData.forEach((data, index) => {
     const safeData = data.length > 15 ? data.substring(0, 15) : data;
-    JsBarcode(canvas, safeData, { format: "CODE128", width: 1, height: 40, displayValue: true });
+    
+    JsBarcode(canvas, safeData, { 
+        format: "CODE128", 
+        width: 2, 
+        height: 40, 
+        displayValue: false, 
+        margin: 0            
+    });
+
+    const imgWidth = canvas.width;
+    const imgHeight = canvas.height;
+    const aspectRatio = imgWidth / imgHeight;
+    
+    const textHeight = 5; 
+    const paddingX = 6; 
+    const maxAvailableWidth = barcodeWidth - paddingX;
+    const maxAvailableHeight = barcodeHeight - textHeight - 5;
+
+    let h = maxAvailableHeight;
+    let w = h * aspectRatio;
+
+    if (w > maxAvailableWidth) {
+        w = maxAvailableWidth;
+    }
+
+    const totalContentHeight = h + textHeight;
+    const startY = y + (barcodeHeight - totalContentHeight) / 2;
+    const centeredX = x + (barcodeWidth - w) / 2;
 
     const barcodeImage = canvas.toDataURL("image/png");
-    doc.addImage(barcodeImage, 'PNG', x, y, barcodeWidth, barcodeHeight);
+    doc.addImage(barcodeImage, 'PNG', centeredX, startY, w, h);
+
+    doc.setFontSize(10);
+    doc.text(safeData, x + barcodeWidth / 2, startY + h + 4, { align: 'center' });
 
     currentPageBarcodes++;
 
     if (currentPageBarcodes === columns * rows) {
-        // Only add a new page if there is more data to process
         if (index < barcodeData.length - 1) {
             doc.addPage();
             addHeaderToPage();
