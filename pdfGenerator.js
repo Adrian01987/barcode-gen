@@ -1,3 +1,7 @@
+if (window.jspdf && window.jspdf.jsPDF) {
+    window.jsPDF = window.jspdf.jsPDF;
+}
+
 function generatePdf(title, columns, rows, barcodeData) {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -19,6 +23,7 @@ function generatePdf(title, columns, rows, barcodeData) {
     };
 
   const addDateToPage = () => {
+    doc.setFontSize(10);
     doc.text(new Date().toLocaleDateString('en-US', {
         year: 'numeric',
         month: '2-digit',
@@ -29,29 +34,31 @@ function generatePdf(title, columns, rows, barcodeData) {
   addHeaderToPage();
   addDateToPage();
 
+  const canvas = document.createElement('canvas');
+
   barcodeData.forEach((data, index) => {
-      if (data.length > 15) {
-          data = data.substring(0, 15);
-      }
+    const safeData = data.length > 15 ? data.substring(0, 15) : data;
+    JsBarcode(canvas, safeData, { format: "CODE128", width: 1, height: 40, displayValue: true });
 
-      const canvas = document.createElement('canvas');
-      JsBarcode(canvas, data, { format: "CODE128", width: 1, height: 40 });
+    const barcodeImage = canvas.toDataURL("image/png");
+    doc.addImage(barcodeImage, 'PNG', x, y, barcodeWidth, barcodeHeight);
 
-      const barcodeImage = canvas.toDataURL("image/png");
-      doc.addImage(barcodeImage, 'PNG', x, y, barcodeWidth, barcodeHeight);
+    currentPageBarcodes++;
 
-      currentPageBarcodes++;
-
-      if (currentPageBarcodes === columns * rows) {
-        doc.addPage();
-        addHeaderToPage();
-        x = margin;
-        y = margin;
-        currentPageBarcodes = 0;
-        addDateToPage();
+    if (currentPageBarcodes === columns * rows) {
+        // Only add a new page if there is more data to process
+        if (index < barcodeData.length - 1) {
+            doc.addPage();
+            addHeaderToPage();
+            addDateToPage();
+            x = margin;
+            y = margin;
+            currentPageBarcodes = 0;
+        }
     } else {
         x += barcodeWidth;
-        if ((index + 1) % columns === 0) {
+        // Move to next row
+        if ((index + 1) % columns === 0) { // Logic fix: check against total processed in this sequence if needed, but this works for simple grids
             x = margin;
             y += barcodeHeight;
         }
@@ -59,4 +66,5 @@ function generatePdf(title, columns, rows, barcodeData) {
 });
 
 doc.save(title + '.pdf');
+
 }
