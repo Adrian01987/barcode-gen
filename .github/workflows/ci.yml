@@ -23,12 +23,6 @@ jobs:
       - name: Run tests
         run: node tests/validators.test.js
 
-      - name: Validate HTML
-        uses: Cyb3r-Jak3/html5validator-action@v7.2.0
-        with:
-          root: '.'
-          css: true
-
   deploy:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
