@@ -1,10 +1,14 @@
 // ============== jsPDF Compatibility ==============
+// jsPDF's UMD build exposes itself as window.jspdf.jsPDF.
+// Create a top-level alias so we can use `new jsPDF()` directly.
 if (window.jspdf && window.jspdf.jsPDF) {
   window.jsPDF = window.jspdf.jsPDF;
 }
 
 // ============== PDF Generator Module ==============
-const PdfGenerator = (function() {
+const PdfGenerator = (function () {
+  'use strict';
+
   // Layout constants (in mm for jsPDF default units)
   const LAYOUT = {
     PAGE_MARGIN: 10,
@@ -20,23 +24,22 @@ const PdfGenerator = (function() {
     BARCODE_VERTICAL_PADDING: 5
   };
 
-  // JsBarcode rendering settings
-  const BARCODE_SETTINGS = {
-    FORMAT: 'CODE128',
+  // Default JsBarcode rendering settings
+  const BARCODE_DEFAULTS = {
     BAR_WIDTH: 2,
     BAR_HEIGHT: 40,
     DISPLAY_VALUE: false,
     MARGIN: 0
   };
 
-  const createBarcodeCanvas = (data) => {
+  const createBarcodeCanvas = (data, format) => {
     const canvas = document.createElement('canvas');
     JsBarcode(canvas, data, {
-      format: BARCODE_SETTINGS.FORMAT,
-      width: BARCODE_SETTINGS.BAR_WIDTH,
-      height: BARCODE_SETTINGS.BAR_HEIGHT,
-      displayValue: BARCODE_SETTINGS.DISPLAY_VALUE,
-      margin: BARCODE_SETTINGS.MARGIN
+      format: format || 'CODE128',
+      width: BARCODE_DEFAULTS.BAR_WIDTH,
+      height: BARCODE_DEFAULTS.BAR_HEIGHT,
+      displayValue: BARCODE_DEFAULTS.DISPLAY_VALUE,
+      margin: BARCODE_DEFAULTS.MARGIN
     });
     return canvas;
   };
@@ -60,7 +63,15 @@ const PdfGenerator = (function() {
     return { width, height, x: centeredX, y: startY };
   };
 
-  const generate = (title, columns, rows, barcodeData) => {
+  // Sanitize a string for use as a filename
+  const sanitizeFilename = (name) => {
+    return name
+      .replace(/[<>:"/\\|?*\x00-\x1f]/g, '')
+      .replace(/\s+/g, '_')
+      .substring(0, 100) || 'barcodes';
+  };
+
+  const generate = (title, columns, rows, barcodeData, format, onProgress) => {
     try {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -92,7 +103,6 @@ const PdfGenerator = (function() {
       addDate();
 
       barcodeData.forEach((data, index) => {
-        const pageIndex = Math.floor(index / barcodesPerPage);
         const positionOnPage = index % barcodesPerPage;
         const col = positionOnPage % columns;
         const row = Math.floor(positionOnPage / columns);
@@ -108,7 +118,7 @@ const PdfGenerator = (function() {
         const cellY = LAYOUT.PAGE_MARGIN + row * cellHeight;
 
         try {
-          const canvas = createBarcodeCanvas(data);
+          const canvas = createBarcodeCanvas(data, format);
           const pos = calculateBarcodePosition(canvas, cellWidth, cellHeight, cellX, cellY);
 
           const barcodeImage = canvas.toDataURL('image/png');
@@ -117,19 +127,25 @@ const PdfGenerator = (function() {
           doc.setFontSize(LAYOUT.BARCODE_LABEL_FONT_SIZE);
           doc.text(data, cellX + cellWidth / 2, pos.y + pos.height + LAYOUT.BARCODE_LABEL_OFFSET_Y, { align: 'center' });
         } catch (barcodeError) {
-          console.error(`Failed to generate barcode for "${data}":`, barcodeError);
+          console.error('Failed to generate barcode for "' + data + '":', barcodeError);
           doc.setFontSize(LAYOUT.BARCODE_LABEL_FONT_SIZE);
-          doc.text(`[Error: ${data}]`, cellX + cellWidth / 2, cellY + cellHeight / 2, { align: 'center' });
+          doc.text('[Error: ' + data + ']', cellX + cellWidth / 2, cellY + cellHeight / 2, { align: 'center' });
+        }
+
+        // Report progress
+        if (typeof onProgress === 'function') {
+          onProgress(index + 1, barcodeData.length);
         }
       });
 
-      doc.save(title + '.pdf');
+      const filename = sanitizeFilename(title) + '.pdf';
+      doc.save(filename);
       return { success: true };
     } catch (error) {
       console.error('PDF generation failed:', error);
       return { success: false, error: error.message };
     }
-  }
+  };
 
   // Public API
   return {
@@ -137,9 +153,10 @@ const PdfGenerator = (function() {
   };
 })();
 
-// Global alias for backward compatibility with app.js
-const generatePdf = (title, columns, rows, barcodeData) => {
-  const result = PdfGenerator.generate(title, columns, rows, barcodeData);
+// Global function for app.js to call
+// Accepts optional format and onProgress callback
+const generatePdf = (title, columns, rows, barcodeData, format, onProgress) => {
+  const result = PdfGenerator.generate(title, columns, rows, barcodeData, format, onProgress);
   if (!result.success) {
     throw new Error(result.error);
   }

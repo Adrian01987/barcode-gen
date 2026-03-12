@@ -1,0 +1,28 @@
+{
+  "name": "barcode-pdf-generator",
+  "version": "2.0.0",
+  "description": "A web application for generating customizable PDF documents with barcodes. Supports CODE128, CODE39, EAN-13, UPC-A, and ITF-14 formats.",
+  "author": "Adrian01987",
+  "license": "MIT",
+  "homepage": "https://adrian01987.github.io/barcode-gen/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Adrian01987/barcode-gen.git"
+  },
+  "keywords": [
+    "barcode",
+    "pdf",
+    "generator",
+    "CODE128",
+    "CODE39",
+    "EAN-13",
+    "UPC-A",
+    "label"
+  ],
+  "scripts": {
+    "test": "node tests/validators.test.js",
+    "lint": "npx eslint app.js pdfGenerator.js",
+    "start": "npx serve ."
+  },
+  "devDependencies": {}
+}

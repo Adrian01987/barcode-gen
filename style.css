@@ -12,6 +12,9 @@
   --color-error-bg: #f8d7da;
   --color-error-text: #842029;
   --color-error-border: #f5c2c7;
+  --color-success: #198754;
+  --color-surface: #f8f9fa;
+  --color-surface-border: #e9ecef;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -20,6 +23,31 @@
   --radius-lg: 0.75rem;
   --transition-fast: 0.15s ease-in-out;
   --transition-normal: 0.2s ease-in-out;
+  color-scheme: light dark;
+}
+
+/* ============== Dark Mode ============== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary: #4d94ff;
+    --color-primary-hover: #3a7ff0;
+    --color-primary-active: #2b6de0;
+    --color-bg: #1a1a2e;
+    --color-card: #222244;
+    --color-text: #e0e0e0;
+    --color-text-muted: #9a9ab0;
+    --color-border: #3a3a5c;
+    --color-border-hover: #5a5a7c;
+    --color-error-bg: #3d1f28;
+    --color-error-text: #f5a0a0;
+    --color-error-border: #6b2a2a;
+    --color-success: #4eca89;
+    --color-surface: #2a2a4a;
+    --color-surface-border: #3a3a5c;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
 }
 
 /* ============== Base Styles ============== */
@@ -63,27 +91,35 @@ h1 {
   max-width: 550px;
 }
 
-.form-control {
+.form-control,
+.form-select {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 0.625rem 0.875rem;
   font-size: 0.9375rem;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  background-color: var(--color-card);
+  color: var(--color-text);
 }
 
-.form-control:hover {
+.form-control:hover,
+.form-select:hover {
   border-color: var(--color-border-hover);
 }
 
-.form-control:focus {
+.form-control:focus,
+.form-select:focus {
   border-color: var(--color-primary);
   outline: none;
   box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+  background-color: var(--color-card);
+  color: var(--color-text);
 }
 
 .form-control::placeholder {
-  color: #adb5bd;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
+  opacity: 0.7;
 }
 
 /* Textarea specific styling */
@@ -99,6 +135,11 @@ textarea.form-control {
 input[type="number"].form-control {
   text-align: center;
   font-weight: 500;
+}
+
+/* Select styling for dark mode */
+.form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
 }
 
 /* ============== Buttons ============== */
@@ -146,6 +187,13 @@ input[type="number"].form-control {
   box-shadow: var(--shadow-sm);
 }
 
+/* Action Buttons Row */
+.action-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 /* ============== Error Message ============== */
 .error-message {
   background-color: var(--color-error-bg);
@@ -181,14 +229,72 @@ input[type="number"].form-control {
 }
 
 .row .mb-3 {
-  background: #f8f9fa;
+  background: var(--color-surface);
   padding: 1rem;
   border-radius: var(--radius-sm);
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--color-surface-border);
 }
 
-.row .form-control {
+.row .form-control,
+.row .form-select {
   background: var(--color-card);
+}
+
+/* ============== Barcode Data Actions ============== */
+.barcode-data-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.barcode-data-actions .form-text {
+  margin-top: 0;
+}
+
+.file-import-label {
+  cursor: pointer;
+  font-size: 0.8125rem;
+  padding: 0.25rem 0.75rem;
+}
+
+/* ============== Progress Bar ============== */
+.progress-container {
+  display: none;
+  margin-bottom: 1.25rem;
+}
+
+.progress-container.visible {
+  display: block;
+}
+
+.progress {
+  height: 0.5rem;
+  border-radius: 1rem;
+  background-color: var(--color-surface);
+  overflow: hidden;
+}
+
+.progress-bar {
+  background-color: var(--color-primary);
+  transition: width 0.15s ease;
+  border-radius: 1rem;
+}
+
+.progress-text {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 0.375rem;
+}
+
+/* ============== Retry Button ============== */
+.retry-btn {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 1000;
 }
 
 /* ============== Responsive Design ============== */
@@ -199,11 +305,11 @@ input[type="number"].form-control {
     margin-right: 1rem;
     border-radius: var(--radius-md);
   }
-  
+
   h1 {
     font-size: 1.5rem;
   }
-  
+
   .row .mb-3 {
     padding: 0.75rem;
   }
@@ -213,7 +319,7 @@ input[type="number"].form-control {
   body {
     background-color: var(--color-card);
   }
-  
+
   .container {
     padding: 1rem;
     margin: 0;
@@ -222,30 +328,34 @@ input[type="number"].form-control {
     box-shadow: none;
     max-width: 100%;
   }
-  
+
   .pdf-title-input {
     max-width: 100%;
   }
-  
+
   h1 {
     font-size: 1.375rem;
     margin-bottom: 1.5rem !important;
   }
-  
+
   .form-label {
     font-size: 0.875rem;
   }
-  
+
   .btn {
     width: 100%;
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
   }
-  
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
   textarea.form-control {
     min-height: 150px;
   }
-  
+
   .row .mb-3 {
     background: transparent;
     padding: 0;
@@ -266,14 +376,15 @@ input[type="number"].form-control {
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-  .form-control {
+  .form-control,
+  .form-select {
     border-width: 2px;
   }
-  
+
   .btn-primary {
     border-width: 2px;
   }
-  
+
   .error-message {
     border-width: 2px;
   }
@@ -281,7 +392,7 @@ input[type="number"].form-control {
 
 /* ============== Field Validation States ============== */
 .form-control.is-valid {
-  border-color: #198754;
+  border-color: var(--color-success);
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
@@ -341,7 +452,7 @@ textarea.form-control.is-invalid {
   color: var(--color-text-muted);
   margin-left: 0.5rem;
   padding: 0.125rem 0.5rem;
-  background: #e9ecef;
+  background: var(--color-surface-border);
   border-radius: 1rem;
 }
 
@@ -350,11 +461,17 @@ textarea.form-control.is-invalid {
   margin-top: 0.5rem;
 }
 
+.preview-summary {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin-left: 0.75rem;
+}
+
 .preview-container {
   margin-top: 1rem;
   padding: 1rem;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background: var(--color-surface);
+  border: 1px solid var(--color-surface-border);
   border-radius: var(--radius-sm);
   overflow: hidden;
   transition: max-height var(--transition-normal), opacity var(--transition-normal), padding var(--transition-normal);
@@ -385,6 +502,7 @@ textarea.form-control.is-invalid {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   text-align: center;
+  position: relative;
 }
 
 .preview-item canvas {
@@ -410,7 +528,7 @@ textarea.form-control.is-invalid {
   align-items: center;
   justify-content: center;
   padding: 0.75rem;
-  background: #e9ecef;
+  background: var(--color-surface-border);
   border-radius: var(--radius-sm);
   font-size: 0.875rem;
   color: var(--color-text-muted);
@@ -421,22 +539,62 @@ textarea.form-control.is-invalid {
   font-size: 0.8125rem;
 }
 
+/* ============== Copy Barcode Button ============== */
+.btn-copy-barcode {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  font-size: 0.625rem;
+  padding: 0.125rem 0.375rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-card);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition-fast), background-color var(--transition-fast);
+}
+
+.preview-item:hover .btn-copy-barcode {
+  opacity: 1;
+}
+
+.btn-copy-barcode:hover {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.btn-copy-barcode.copied {
+  background: var(--color-success);
+  color: #fff;
+  border-color: var(--color-success);
+  opacity: 1;
+}
+
 /* ============== Print Styles ============== */
 @media print {
   body {
     background: white;
   }
-  
+
   .container {
     box-shadow: none;
     max-width: 100%;
   }
-  
-  .btn {
+
+  .btn,
+  .action-buttons,
+  .file-import-label,
+  .barcode-data-actions,
+  .retry-btn {
     display: none;
   }
-  
+
   .preview-section {
+    display: none;
+  }
+
+  .progress-container {
     display: none;
   }
 }

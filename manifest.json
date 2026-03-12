@@ -1,0 +1,16 @@
+{
+  "name": "Barcode PDF Generator",
+  "short_name": "Barcode Gen",
+  "description": "Generate printable PDF sheets with barcodes",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f0f2f5",
+  "theme_color": "#0d6efd",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='5' y='10' width='6' height='80' fill='%23333'/><rect x='15' y='10' width='3' height='80' fill='%23333'/><rect x='22' y='10' width='8' height='80' fill='%23333'/><rect x='34' y='10' width='4' height='80' fill='%23333'/><rect x='42' y='10' width='6' height='80' fill='%23333'/><rect x='52' y='10' width='3' height='80' fill='%23333'/><rect x='58' y='10' width='8' height='80' fill='%23333'/><rect x='70' y='10' width='5' height='80' fill='%23333'/><rect x='79' y='10' width='3' height='80' fill='%23333'/><rect x='86' y='10' width='9' height='80' fill='%23333'/></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
